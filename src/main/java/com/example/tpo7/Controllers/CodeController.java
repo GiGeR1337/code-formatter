@@ -1,18 +1,17 @@
 package com.example.tpo7.Controllers;
 
+import com.example.tpo7.Models.Code;
 import com.example.tpo7.Services.CodeFormatterService;
 import com.example.tpo7.Services.CodeService;
 import com.google.googlejavaformat.java.FormatterException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class CodeController {
-    private CodeFormatterService codeFormatterService;
-    private CodeService codeService;
+    private final CodeFormatterService codeFormatterService;
+    private final CodeService codeService;
 
     public CodeController(CodeFormatterService codeFormatterService, CodeService codeService) {
         this.codeFormatterService = codeFormatterService;
@@ -38,11 +37,23 @@ public class CodeController {
 
             return "index";
         } catch (FormatterException e) {
-            model.addAttribute("error", "Could not format code. Make sure it's a complete and valid Java class. Details: " + e.getMessage());
+            model.addAttribute("error", "Cannot format code, " + e.getMessage());
             return "error";
         } catch (Exception e) {
-            model.addAttribute("error", "Something went wrong: " + e.getMessage());
+            model.addAttribute("error", e.getMessage());
             return "error";
         }
+    }
+
+    @GetMapping("/getCode/{id}")
+    public String getFormattedCode(@PathVariable String id, Model model) {
+        Code code = codeService.get(id);
+        if (code == null) {
+            model.addAttribute("error", "Code not found or expired");
+            return "error";
+        }
+
+        model.addAttribute("getCode", code.getFormattedCode());
+        return "getCode";
     }
 }

@@ -1,59 +1,55 @@
 package com.example.tpo7.Services;
 
 import com.example.tpo7.Models.Code;
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.util.*;
 
 @Service
 public class CodeService {
-    private final Map<String, Code> codeStorage = new HashMap<>();
+    private final Map<String, Long> codeStorage = new HashMap<>();
+    private final File storageDir = new File("codeData");
+
+    public CodeService() {
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+    }
 
     public void save(String id, String codeText, long durationSeconds) {
         long now = System.currentTimeMillis();
-        long ttl = durationSeconds * 1000;
-        Code code = new Code(codeText, now, ttl);
-        codeStorage.put(id, code);
+        long duration = durationSeconds * 1000;
+        Code code = new Code(codeText, now, duration);
+
+        File file = new File(storageDir, id + ".ser");
+
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+            out.writeObject(code);
+            codeStorage.put(id, now + duration);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot save code: " + e.getMessage());
+        }
     }
 
     public Code get(String id) {
-        Code snippet = codeStorage.get(id);
-        if (snippet == null) return null;
+        File file = new File(storageDir, id + ".ser");
+
+        if (!file.exists()) return null;
 
         long now = System.currentTimeMillis();
-        boolean expired = now - snippet.getTimestamp() > snippet.getTtl();
+        Long expiryTime = codeStorage.get(id);
 
-        if (expired) {
+        if (expiryTime != null && now > expiryTime) {
+            file.delete();
             codeStorage.remove(id);
             return null;
         }
-        return snippet;
-    }
 
-    @PostConstruct
-    public void startThread() {
-        Thread cleaner = new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(5000);
-
-                    long now = System.currentTimeMillis();
-
-                    for (String id : codeStorage.keySet()) {
-                        Code code = codeStorage.get(id);
-                        if (code != null && now - code.getTimestamp() > code.getTtl()) {
-                            codeStorage.remove(id);
-                        }
-                    }
-
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-        });
-
-        cleaner.setDaemon(true);
-        cleaner.start();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            return (Code) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
+        }
     }
 }
