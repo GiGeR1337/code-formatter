@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Formatted Code</title>
-    <link rel="stylesheet" href="/style.css">
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Formatted Code')}"></head>
+
 <body>
-    <div>
-        <h2>Formatted</h2>
-        <pre th:text="${getCode}"></pre>
-    </div>
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="container">
+    <h2 class="my-4">Formatted Code</h2>
+    <pre class="p-3 bg-light rounded" th:text="${getCode}"></pre>
+    <a class="btn btn-secondary mt-3" href="/">Back to Form</a>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

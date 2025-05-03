@@ -1,28 +1,36 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>s30176</title>
-    <link rel="stylesheet" th:href="style.css">
-</head>
+<head th:replace="~{fragments/head :: head('Code Formatter')}"></head>
+
 <body>
-    <h1>Enter code</h1>
-    <form action="/format" method="post">
-        <textarea name="code" rows="10" cols="80" required></textarea><br/>
-        ID:
-        <input type="text" name="id" required/><br/>
-        Duration (sec):
-        <input type="number" name="durationSeconds" min="10" max="7776000" required/><br/>
-        <button type="submit">Format</button>
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="container">
+    <h1 class="my-4">Enter code</h1>
+    <form class="mb-5 p-4 bg-light rounded" method="post" th:action="@{/format}">
+        <div class="mb-3">
+            <textarea class="form-control" name="code" required rows="10"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">ID:</label>
+            <input class="form-control" name="id" required type="text"/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Duration (sec):</label>
+            <input class="form-control" max="7776000" min="10" name="durationSeconds" required type="number"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Format</button>
     </form>
 
-    <div>
-        <h2>Original</h2>
-        <pre th:text="${original}"></pre>
+    <div class="mb-5" th:if="${original} or ${formatted}">
+        <h2 class="mb-3">Original</h2>
+        <pre class="p-3 bg-light rounded" th:text="${original}"></pre>
 
-        <h2>Formatted</h2>
-        <pre th:text="${formatted}"></pre>
-
+        <h2 class="mb-3 mt-4">Formatted</h2>
+        <pre class="p-3 bg-light rounded" th:text="${formatted}"></pre>
     </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

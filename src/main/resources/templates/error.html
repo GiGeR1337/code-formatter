@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Error</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+<head th:replace="~{fragments/head :: head('Error')}"></head>
+
 <body>
-    <h2>Error</h2>
-    <p th:text="${error}"></p>
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="container">
+    <div class="alert alert-danger mt-4">
+        <h2 class="alert-heading">Error</h2>
+        <p th:text="${error}"></p>
+        <a class="btn btn-outline-danger mt-2" href="/">Back to Form</a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

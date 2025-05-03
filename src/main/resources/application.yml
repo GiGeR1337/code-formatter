@@ -3,3 +3,8 @@ spring:
     location: s30176-logo
   application:
     name: TPO7
+  thymeleaf:
+    cache: false
+server:
+  servlet:
+    context-path: /codeFormatter
